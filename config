@@ -1,0 +1,42 @@
+ngx_addon_name=ngx_http_stomp_module
+
+
+HTTP_STOMP_SRCS="$ngx_addon_dir/ngx_http_stomp_module.c \
+"
+
+HTTP_STOMP_DEPS="$NGX_ADDON_DEPS \
+$ngx_addon_dir/ngx_http_stomp_module.h \
+"
+
+# with c-stomp feature
+ngx_feature="ngx_http_stomp_c_stomp"
+ngx_feature_name="NGX_HAVE_HTTP_STOMP_C_STOMP"
+ngx_feature_run=no
+ngx_feature_incs="#include <cstomp.h>"
+ngx_feature_path=
+ngx_feature_libs="-lcstomp"
+ngx_feature_exit_if_not_found=yes
+ngx_feature_test="cstmp_session_t *consuming_sess;cstmp_frame_t *consume_fr;"
+. auto/feature
+
+if [ $ngx_found = yes ]; then
+have=NGX_HTTP_STOMP_C_STOMP . auto/have
+else
+echo "c-stomp library not found, you need to install c-stomp library via 'https://github.com/Taymindis/c-stomp'"
+echo
+exit 1
+fi
+
+if test -n "$ngx_module_link"; then
+    ngx_module_type=HTTP
+    ngx_module_name=$ngx_addon_name
+    ngx_module_deps="$HTTP_STOMP_DEPS"
+    ngx_module_srcs="$HTTP_STOMP_SRCS"
+    ngx_module_libs="-lcstomp"
+    . auto/module
+else
+  HTTP_MODULES="$HTTP_MODULES ngx_http_stomp_module"
+  NGX_ADDON_DEPS="$NGX_ADDON_DEPS $HTTP_STOMP_DEPS"
+  NGX_ADDON_SRCS="$NGX_ADDON_SRCS $HTTP_STOMP_SRCS"
+  CORE_LIBS="$CORE_LIBS $ngx_feature_libs"
+fi
