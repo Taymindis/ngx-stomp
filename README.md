@@ -82,8 +82,8 @@ Directive
 | -------------     |:-------------:                                                                                                                        |
 | stomp_subscribes  | which need to defined in upstream block, to tell that which destination queue going to subscribe                                      |
 | stomp_endpoint    | the AMQ server which has stomp protocol feature.                                                                                      |
-| max_send_sess     | the maximum connection which allow to use for sending message to amq server                                                           |
-| max_recv_sess     | the maximum connection which allow to use for consuming message from amq server                                                       |
+| max_send_sess     | the maximum connection which allow to use for sending message to amq server, default is 10                                            |
+| max_recv_sess     | the maximum connection which allow to use for consuming message from amq server, default is 5                                         |
 | stomp_pass        | upstream to stomp.                                                                                                                    |
 | stomp_command     | frame command ( Please note that 'CONSUME' command is the extra command which allow you to consume the message via HTTP request )     |
 | stomp_headers     | frame headers when sending the message                                                                                                |
