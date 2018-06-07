@@ -553,6 +553,10 @@ ngx_stomp_upstream_wev_handler(ngx_http_request_t *r, ngx_http_upstream_t *u) {
     }
     return;
 STOMP_FAILED_PROCESS_IO:
+    if(stss->sess) {
+        ngx_close_socket(stss->sess->sock);
+        stss->sess = NULL;
+    }
     ctx = ngx_http_get_module_ctx(r, ngx_http_stomp_module);
     ngx_log_debug(NGX_LOG_DEBUG_HTTP, c->log, 0, "ngx_stomp: IO PROCESS FAILED");
     ngx_http_frame_error_response("ngx_stomp: error while sending stomp");
@@ -1671,6 +1675,10 @@ STOMP_REQUEST_ERROR:
 #endif
 
 STOMP_CONN_ERROR:
+    if(stss->sess) {
+        ngx_close_socket(stss->sess->sock);
+        stss->sess = NULL;
+    }
     ngx_unlock(&stss->in_use);
     ngx_log_error(NGX_LOG_ERR, pc->log, 0, "ngx_stomp: failed to get a free nginx connection");
 #if defined(nginx_version) && (nginx_version >= 8017)
