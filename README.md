@@ -28,7 +28,7 @@ Usage
 ```nginx
 # nginx.conf
   upstream stomp {
-        stomp_subscribes /amq/queue/stompqueue /amq/queue/stompqueue2;
+        stomp_subscribes /amq/queue/stompqueue;
         stomp_endpoint 127.0.0.1:61618 login=guest passcode=guest max_send_sess=3 max_recv_sess=3;
     }
 ```
