@@ -348,7 +348,7 @@ static ngx_command_t  ngx_http_stomp_commands[] = {
     },
 
     {   ngx_string("stomp_subscribes"),
-        NGX_HTTP_UPS_CONF | NGX_CONF_1MORE,
+        NGX_HTTP_UPS_CONF | NGX_CONF_TAKE1, // change to only take 1 queue per stomp connection
         ngx_http_stomp_subscribe_queue_command,
         NGX_HTTP_SRV_CONF_OFFSET,
         0,
