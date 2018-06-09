@@ -44,8 +44,10 @@ static void ngx_http_stomp_upstream_cleanup(void *data);
 // static void ngx_http_stomp_debug_frame(ngx_http_request_t *r, u_char *str, size_t len);
 static void ngx_http_stomp_dump_frame(ngx_http_request_t *r, cstmp_frame_t*);
 
+/** Force no write lock in cstomp since nginx is handling lock **/
 #define ngx_http_stomp_send(stss, fr) ({\
 ngx_int_t rc;\
+stss->sess->write_lock=0;\
 if(stss->is_direct_frame) {\
  rc = cstmp_send_direct(stss->sess, fr->body.start, 1);\
 }else {\
@@ -53,7 +55,10 @@ if(stss->is_direct_frame) {\
 }\
 rc;})
 
-#define ngx_http_stomp_recv(stss, fr) cstmp_recv(stss->sess, fr, 1)
+/** Force no read lock in cstomp since nginx is handling lock **/
+#define ngx_http_stomp_recv(stss, fr)({\
+stss->sess->read_lock=0;\
+cstmp_recv(stss->sess, fr, 1);})
 
 #define ngx_http_stomp_add_read_write_event(_c, _rw_type, _rw_ev ) \
 if (ngx_event_flags & NGX_USE_RTSIG_EVENT) {\
