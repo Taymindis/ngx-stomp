@@ -553,7 +553,7 @@ ngx_stomp_upstream_wev_handler(ngx_http_request_t *r, ngx_http_upstream_t *u) {
     }
     return;
 STOMP_FAILED_PROCESS_IO:
-    if(stss->sess) {
+    if (stss->sess) {
         ngx_close_socket(stss->sess->sock);
         stss->sess = NULL;
     }
@@ -1541,7 +1541,6 @@ FOUND_PEER:
 
     ngx_http_stomp_add_cleanup_pool;
 
-STOMP_CONT_SESS:
     if (stss->sess) {
         if (!ctx->readonly) {
             ngx_log_error(NGX_LOG_DEBUG, pc->log, 0, "ngx_stomp: preparing stomp sending frame");
@@ -1582,8 +1581,9 @@ STOMP_CONT_SESS:
         // wev->log = pc->log;
 
         if (ctx->readonly) {
-            stss->state = stomp_read;
+            c->write->ready = 0;
             ngx_http_stomp_add_read_write_event(c, c->read, NGX_READ_EVENT);
+            stss->state = stomp_read;
             // ngx_stomp_upstream_rev_handler(r, r->upstream);
         } else {
             stss->state = stomp_send;
@@ -1635,32 +1635,30 @@ STOMP_CONT_SESS:
     ngx_stomp_register_read_write_event_model;
 
     ngx_str_t username, password;
-    if (peer->username_val->value.len && peer->password_val->value.len) {
+    stss->state = stomp_connect;
+
+    fr->cmd = (u_char*)"CONNECT";
+    cstmp_add_header_str(fr, (u_char*)"accept-version:1.2"); // for direct string set method
+
+    if (peer->username_val->value.len) {
         if (ngx_http_complex_value(r, peer->username_val, &username) != NGX_OK) {
             goto STOMP_REQUEST_ERROR;
         }
         username.data += sizeof("login"); // same with sizeof("login=") -1
         username.len -= sizeof("login");
-
+        cstmp_add_header(fr, (u_char*)"login", username.data); // for key val set method
+    }
+    if (peer->password_val->value.len) {
         if (ngx_http_complex_value(r, peer->password_val, &password) != NGX_OK) {
             goto STOMP_REQUEST_ERROR;
         }
 
         password.data += sizeof("passcode"); // same with sizeof("passcode=") -1
         password.len -= sizeof("passcode");
-        stss->state = stomp_connect;
-
-        fr->cmd = (u_char*)"CONNECT";
-        cstmp_add_header_str(fr, (u_char*)"accept-version:1.2"); // for direct string set method
-        cstmp_add_header(fr, (u_char*)"login", username.data); // for key val set method
         cstmp_add_header(fr, (u_char*)"passcode", password.data); // in case you need len specified
-
-        stmpc->log->action = "connecting to stomp ";
-        ngx_log_error(NGX_LOG_DEBUG, pc->log, 0,
-                      "ngx_stomp: Connecting host=%V, port=%d, login=%V, and passcode=%V", &peer->host,  peer->port, &username, &password);
-    } else {
-        goto STOMP_CONT_SESS;
     }
+    stmpc->log->action = "connecting to stomp ";
+    ngx_log_error(NGX_LOG_DEBUG, pc->log, 0, "ngx_stomp: Connecting host=%V, port=%d", &peer->host, peer->port);
 
     return NGX_AGAIN;
 
@@ -1675,7 +1673,7 @@ STOMP_REQUEST_ERROR:
 #endif
 
 STOMP_CONN_ERROR:
-    if(stss->sess) {
+    if (stss->sess) {
         ngx_close_socket(stss->sess->sock);
         stss->sess = NULL;
     }

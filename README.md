@@ -45,7 +45,8 @@ server {
 	   stomp_command SEND;
 	   stomp_headers "destination:/amq/queue/stompqueue
 					  persistent:false
-					  content-type:text/plain";
+            content-type:text/plain
+					  content-length:38";
 	   stomp_body "This is new message sending from stomp";
 	}
 }
