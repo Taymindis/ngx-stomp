@@ -1599,7 +1599,7 @@ FOUND_PEER:
     pc->name = &peer->name;
     pc->cached = 0;
 
-    if (!(stss->sess = cstmp_connect((const char*) peer->host.data, peer->port ))) {
+    if (!(stss->sess = cstmp_connect_t((const char*) peer->host.data, peer->port, 3 /*send timeout 3 sec*/, 3000 ))) {
         goto STOMP_CONN_ERROR;
     }
 
