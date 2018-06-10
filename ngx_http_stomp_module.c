@@ -1385,6 +1385,7 @@ ngx_http_stomp_upstream_upstream_init(ngx_conf_t *cf, ngx_http_upstream_srv_conf
                 stss->in_use = 0;
                 stss->sess = NULL;
                 stss->conn = NULL;
+                stss->frame = NULL;
             }
 
             peer->stomp_recv_sessions = ngx_array_create(cf->pool, server[i].max_recv_sess,
@@ -1401,6 +1402,7 @@ ngx_http_stomp_upstream_upstream_init(ngx_conf_t *cf, ngx_http_upstream_srv_conf
                 stss->in_use = 0;
                 stss->sess = NULL;
                 stss->conn = NULL;
+                stss->frame = NULL;
             }
             n++;
         }
@@ -1625,6 +1627,9 @@ FOUND_PEER:
     stmpc->log = pc->log;
     stmpc->log_error = pc->log_error;
     stmpc->number = ngx_atomic_fetch_add(ngx_connection_counter, 1);
+
+    /** In case reconnecting **/
+    cstmp_destroy_frame(stss->frame);
 
     fr = stss->frame = cstmp_new_frame();
     r->upstream->peer.data = stss;
