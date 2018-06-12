@@ -27,6 +27,25 @@ echo
 exit 1
 fi
 
+
+
+ngx_feature="ngx_http_stomp_c_stomp_shr_conn"
+ngx_feature_name="NGX_HAVE_HTTP_STOMP_C_STOMP_SHR_CONN"
+ngx_feature_run=no
+ngx_feature_incs="#include <cstomp.h>"
+ngx_feature_path=
+ngx_feature_libs="-lcstomp"
+ngx_feature_exit_if_not_found=yes
+ngx_feature_test="cstmp_session_t sess;sess.read_lock=0;"
+. auto/feature
+
+if [ $ngx_found = yes ]; then
+have=NGX_HTTP_STOMP_C_STOMP_SHR_CONN . auto/have
+else
+echo "cstomp is running non sharing connection feature"
+echo
+fi
+
 if test -n "$ngx_module_link"; then
     ngx_module_type=HTTP
     ngx_module_name=$ngx_addon_name
