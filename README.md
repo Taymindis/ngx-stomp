@@ -13,6 +13,7 @@ Table of Contents
 * [Directive](#directive)
 * [Installation](#installation)
 * [Test](#test)
+* [Tips](#tips)
 * [Support](#support)
 * [Copyright & License](#copyright--license)
 
@@ -121,6 +122,25 @@ cd /path/to/ngx-stomp
 export PATH=/path/to/nginx-dirname:$PATH 
 sudo prove t
 ```
+
+[Back to TOC](#table-of-contents)
+
+
+Tips
+=====
+
+The more subscribe session you set, the more consumer will listen to the message, please do set a fixed consumer session that are constantly consume the message, else the message might send to some consumer which is actively call for consuming
+
+For example, if you set max_recv_sess=5, it will subscribe 5 listener later, you should have 5 connection to do constantly polling. If you just need one polling please set to `max_recv_sess=1`, then you connection polling should not be more than 1 .
+
+Example of 1 receving session and 3 sending session.
+![Image of 1](1recv-3send.png)
+
+
+
+Example of 5 receving session and 10 sending session.
+![Image of 2](5recv-10send.png)
+
 
 [Back to TOC](#table-of-contents)
 
