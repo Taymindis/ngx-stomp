@@ -129,9 +129,9 @@ sudo prove t
 Tips
 =====
 
-The more subscribe session you set, the more consumer will listen to the message, please do set a fixed consumer session that are constantly consume the message, else the message might send to some consumer which is actively call for consuming
+The more subscribe session you set, the more consumer will listen to the subscribed queue, suggested to set a fixed consumer session that are constantly consuming the queue, else the broker might send to some consumer which is not actively call for consuming
 
-For example, if you set max_recv_sess=5, it will subscribe 5 listener later, you should have 5 connection to do constantly polling. If you just need one polling please set to `max_recv_sess=1`, then you connection polling should not be more than 1 .
+For example, if you set max_recv_sess=5, it will subscribe 5 listener later, you should have 5 connection to do constantly polling. If you just need one polling please set to `max_recv_sess=1`, then you connection polling should not be more than 1.
 
 Example of 1 receving session and 3 sending session.
 ![Image of 1](1recv-3send.png)
